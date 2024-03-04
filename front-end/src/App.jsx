@@ -15,7 +15,7 @@ function App() {
  
   return (
     <>
-      <Router>
+      {/* <Router>
       <Routes>
         <Route path="/login" element={<Login setToken={setToken} />} />
         {token ? (
@@ -27,9 +27,10 @@ function App() {
           <Route path="/" element={<Navigate to="/login" />} />
         )}
       </Routes>
-      </Router>
+      </Router> */}
 
       {/* <ThemeConfig/> */}
+      <Shop></Shop>
     </>
   );
 }

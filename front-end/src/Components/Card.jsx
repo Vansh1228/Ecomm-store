@@ -39,7 +39,7 @@ export const ImgMediaCard = (props) => {
             </CardContent>
             <CardActions>
               <Button size="small">Add to Cart</Button>
-              <Button size="small">Buy Now</Button>
+              <Button size="small">View</Button>
             </CardActions>
           </Card>
       

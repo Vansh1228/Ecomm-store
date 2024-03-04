@@ -30,7 +30,7 @@ function Shop() {
       const result = await fetch("http://localhost:3000/");
       const data = await result.json();
       setShopDet(data);
-      //   console.log(items);
+      console.log(items);
     };
 
     fetchData();
@@ -38,31 +38,39 @@ function Shop() {
 
   return (
     <>
-      <Link to="/shop">
-        <div className="shop">
-          <div className="shopTitle"></div>
-          {shopDet.map((dummy) => (
-            <>
-              <h1>{dummy.AppName}</h1>
-              <img src={dummy.logo} alt="" className="logo" />
-            </>
-          ))}
+      {/* <Link to="/shop"> */}
+      <div className="shop">
+        <div className="shopTitle"></div>
+        {shopDet.map((dummy) => (
+          <>
+            <h1>{dummy.AppName}</h1>
+            <img src={dummy.logo} alt="" className="logo" />
+          </>
+        ))}
+      </div>
+      <div>
+        <section className="filter">
+          <h3>Men's Apparel</h3>
+          <h3>Women's Apparel</h3>
+          <h3>Electronics</h3>
+          <h3>Jewelery</h3>
+        </section>
+      </div>
+      <div className="products">
+        <Container>
+          <Grid container spacing={2} style={{ marginTop: "20px" }}>
+            {items.map((product, index) => {
+              return (
+                <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={index}>
+                  <ImgMediaCard data={product} />
+                </Grid>
+              );
+            })}
+          </Grid>
+        </Container>
+      </div>
 
-          <div className="products">
-            <Container>
-              <Grid container spacing={2} style={{ marginTop: "20px" }}>
-                {items.map((product, index) => {
-                  return (
-                    <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={index}>
-                      <ImgMediaCard data={product} />
-                    </Grid>
-                  );
-                })}
-              </Grid>
-            </Container>
-          </div>
-        </div>
-      </Link>
+      {/* </Link> */}
     </>
   );
 }
