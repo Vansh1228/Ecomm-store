@@ -1,18 +1,14 @@
 import { useState } from "react";
-import axios from "axios"
+import axios from "axios";
 import "./Login.css";
-import { useNavigate } from 'react-router-dom';
-function Login({ token, setToken }) {
+import { useNavigate } from "react-router-dom";
+function Login({ setToken }) {
   const [userName, setUserName] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
-  const loginHandler =  () => {
-    setError("")
-    setUserName("")
-    setUserPassword("")
-    
+  const loginHandler = () => {
     axios({
       url: "https://fakestoreapi.com/auth/login",
       method: "POST",
@@ -21,18 +17,19 @@ function Login({ token, setToken }) {
         password: userPassword,
       },
     })
-      .then((res) => { 
+      .then((res) => {
         console.log(res.data.token);
         setToken(res.data.token);
-        navigate('/shop');
-        localStorage.setItem("userToken", res.data.token)
+        navigate("/shop");
+        localStorage.setItem("userToken", res.data.token);
+        setError("");
+        setUserName("");
+        setUserPassword("");
       })
-      .catch((err)=>{
+      .catch((err) => {
         console.log(err.response);
-        setError(err.response.data)
-      })
-  
-        
+        setError(err.response.data);
+      });
   };
 
   return (
@@ -40,21 +37,19 @@ function Login({ token, setToken }) {
       <div className="container">
         <div className="login">
           <input
-          value={userName}
+            value={userName}
             type="text"
             placeholder="Username"
             onChange={(e) => setUserName(e.target.value)}
           />{" "}
-     
           <input
-          value={userPassword}
+            value={userPassword}
             type="password"
             placeholder="Password"
             onChange={(e) => setUserPassword(e.target.value)}
           />
-        
           {error && <small>{error}</small>}
-          <button onClick={loginHandler} >Login</button>
+          <button onClick={loginHandler}>Login</button>
         </div>
       </div>
     </>
