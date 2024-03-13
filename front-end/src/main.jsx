@@ -5,14 +5,12 @@ import "./index.css";
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import cartSlice from "./Redux/cartSlice.js";
-import fetchSlice from "./Redux/FetchProductSlice.js"
-import indiSlice from "./Redux/indiProd.js"
+import fetchSlice from "./Redux/FetchProductSlice.js";
 
 const store = configureStore({
   reducer: {
     cart: cartSlice,
-    fetchProd: fetchSlice,
-    indiProd: indiSlice
+    AllProducts: fetchSlice,
   },
 });
 ReactDOM.createRoot(document.getElementById("root")).render(

@@ -1,9 +1,8 @@
 import * as React from "react";
-import { useState } from "react";
+
 import { Link } from "react-router-dom";
 import { addToCart } from "../Redux/cartSlice";
-import { useDispatch } from "react-redux";
-import { indiProd } from "../Redux/indiProd";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   Card,
@@ -15,21 +14,16 @@ import {
 } from "@mui/material";
 
 export const ImgMediaCard = (props) => {
-  const [inCart, setIncart] = useState(false);
-
+  const cartItems = useSelector((state) => state.cart);
+  const itemKeys = Object.keys(cartItems);
   const dispatch = useDispatch();
+
   const handleOnCLick = () => {
-    setIncart(true);
-    if (inCart) {
-    } else {
-      dispatch(addToCart(props));
-    }
+    dispatch(addToCart(props.data.id));
   };
 
-  const handleView = (productId) => {
-    return dispatch(indiProd(productId));
-  };
   const { id, image, title, price } = props.data;
+
   return (
     <>
       <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
@@ -66,18 +60,17 @@ export const ImgMediaCard = (props) => {
           </Typography>
         </CardContent>
         <CardActions>
-          <Button onClick={handleOnCLick} size="small">
-            {inCart ? (
-              <>
-                <Link to="/cart">Go to Cart</Link>
-              </>
-            ) : (
-              "Add to cart"
-            )}
-          </Button>
-          <Link to={`/product/${id}`} onClick={() => handleView(id)}>
-            View
-          </Link>
+          {itemKeys.includes(id.toString()) ? (
+            <>
+              <Link to="/cart">Go to Cart</Link>
+            </>
+          ) : (
+            <>
+              <Button onClick={handleOnCLick}> Add to cart</Button>
+            </>
+          )}
+
+          <Link to={`/product/${id}`}>View</Link>
         </CardActions>
       </Card>
     </>

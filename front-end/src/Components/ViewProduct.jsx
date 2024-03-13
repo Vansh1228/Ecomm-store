@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-
+import { fetchProd } from "../Redux/FetchProductSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Card,
@@ -10,30 +10,32 @@ import {
   Grid,
   Container,
 } from "@mui/material";
-
+import { useParams } from "react-router-dom";
 function ViewProduct() {
-  const indiData = useSelector((state) => state.indiProd);
-  useEffect(() => {
-    if (indiData.length === 0) {
-      console.log("Data fail: []");
-    } else {
-      console.log("Data success:", indiData);
-    }
-  }, [indiData]);
+  const [viewProduct, setVIewProduct] = useState([]);
+  const { id } = useParams();
 
-  if (indiData.length === 0) {
+  const dispatch = useDispatch();
+  const apiData = useSelector((state) => state.AllProducts);
+
+  useEffect(() => {
+    dispatch(fetchProd());
+
+    const myProduct = apiData.filter((prod) => prod.id == id);
+
+    setVIewProduct(myProduct[0]);
+  }, [dispatch, apiData.length]);
+
+  if (!viewProduct) {
     return <div>Loading...</div>;
   }
-
-  const { image, title, price, description, rating } = indiData[0];
-
-  console.log(indiData);
+  const { image, title, price, description, rating } = viewProduct;
   return (
-    <>
+  
       <div className="cart">
         <Container style={{ width: "400px", height: "400px" }}>
           <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-            <Card sx={{}}>
+            <Card >
               <CardMedia
                 component="img"
                 alt={title}
@@ -87,7 +89,7 @@ function ViewProduct() {
                       fontSize: "18px",
                     }}
                   >
-                    User ratings: {rating.rate}
+                    {/* User ratings: {rating.rate} */}
                   </Typography>
                 </div>
               </CardContent>
@@ -95,7 +97,7 @@ function ViewProduct() {
           </Grid>
         </Container>
       </div>
-    </>
+    
   );
 }
 

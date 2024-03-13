@@ -1,46 +1,43 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = [];
+const initialState = JSON.parse(localStorage.getItem("MyCart")) || [];
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
     removeFromCart(state, action) {
-      const { id } = action.payload.data;
+      const id = action.payload;
 
-      // Check if the item's cartQuantity is 1
-      if (action.payload.cartQuantity === 1) {
-        // Filter out the item from the cartItems array
-        const updateCartItems = state.filter((item) => item.data.id !== id);
-        return updateCartItems;
-      } else {
-        // Decrease the cartQuantity of the item
-        const updateCartItems = state.map((item) =>
-          item.data.id === id
-            ? { ...item, cartQuantity: item.cartQuantity - 1 }
-            : item
-        );
-        return updateCartItems;
+      const updatedState = { ...state };
+
+      if (updatedState.hasOwnProperty(id)) {
+        // If the item exists in the cart, decrease its quantity
+        updatedState[id] -= 1; // Decrease quantity
+      
+        // If quantity reaches 0, remove the item from the cart
+        if (updatedState[id] === 0) {
+          delete updatedState[id]; // Remove item from cart
+        }
       }
+      localStorage.setItem("MyCart", JSON.stringify(updatedState));
+      return updatedState;
     },
-    addToCart(state, action) {
-      console.log(action);
-      const existingItem = state.find(
-        (item) => item.data.id === action.payload.data.id
-      );
 
-      if (existingItem) {
+    addToCart(state, action) {
+      const id = action.payload;
+
+      const updatedState = { ...state };
+
+      if (updatedState.hasOwnProperty(id)) {
         // If the item already exists in the cart, update its quantity
-        return state.map((item) =>
-          item.data.id === action.payload.data.id
-            ? { ...item, cartQuantity: item.cartQuantity + 1 }
-            : item
-        );
+        updatedState[id] += 1; // Increment quantity
       } else {
         // If the item does not exist in the cart, add it with quantity 1
-        return [...state, { data: action.payload.data, cartQuantity: 1 }]; //We return an array because the initial state of the cart is an array
+        updatedState[id] = 1;
       }
+      localStorage.setItem("MyCart", JSON.stringify(updatedState));
+      return updatedState;
     },
   },
 });

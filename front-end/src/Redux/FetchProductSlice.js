@@ -9,7 +9,7 @@ export const fetchProd = createAsyncThunk("fetchProd", async () => {
 
 const initialState = [];
 const fetchSlice = createSlice({
-  name: "fetchProduct",
+  name: "AllProducts",
   initialState,
   reducers: {},
   extraReducers: (builder) => {

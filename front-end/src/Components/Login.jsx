@@ -8,28 +8,22 @@ function Login({ setToken }) {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const loginHandler = () => {
-    axios({
-      url: "https://fakestoreapi.com/auth/login",
-      method: "POST",
-      data: {
+  const loginHandler = async () => {
+    try {
+      const response = await axios.post("https://fakestoreapi.com/auth/login", {
         username: userName,
         password: userPassword,
-      },
-    })
-      .then((res) => {
-        console.log(res.data.token);
-        setToken(res.data.token);
-        navigate("/shop");
-        localStorage.setItem("userToken", res.data.token);
-        setError("");
-        setUserName("");
-        setUserPassword("");
-      })
-      .catch((err) => {
-        console.log(err.response);
-        setError(err.response.data);
       });
+
+      setToken(response.data.token);
+      navigate("/shop");
+      localStorage.setItem("userToken", response.data.token);
+      setError("");
+      setUserName("");
+      setUserPassword("");
+    } catch (error) {
+      setError(error.response.data);
+    }
   };
 
   return (
