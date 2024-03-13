@@ -1,5 +1,4 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Grid, Container } from "@mui/material";
 import { fetchProd } from "../Redux/FetchProductSlice";
 import {
   Card,
@@ -7,6 +6,9 @@ import {
   CardContent,
   CardMedia,
   Typography,
+  Grid,
+  Button,
+  Container,
 } from "@mui/material";
 import { addToCart, removeFromCart } from "../Redux/cartSlice";
 import { useEffect, useState } from "react";
@@ -30,22 +32,25 @@ const Cart = () => {
     return total + product.price * quantity;
   }, 0);
   const length = Object.keys(storedCartItems).length === 0;
-  const [isEmpty, setIsEmpty] = useState(false);
+
   useEffect(() => {
-    length ? setIsEmpty(true) : setIsEmpty(false);
-    
-    if (isEmpty || !filteredItems) {
+    if (length) {
       // Redirect to the shop page if the cart is empty
       navigate("/shop");
     } else {
       dispatch(fetchProd());
     }
-  }, [apiData.length, dispatch, isEmpty, filteredItems.length]);
-
+  }, [apiData.length, dispatch, length]);
+  const increaseItemQuantity = (id) => {
+    dispatch(addToCart(id));
+  };
+  const decreaseItemQuantity = (id) => {
+    dispatch(removeFromCart(id));
+  };
   return (
     <div className="cart">
-      <Container>
-        <Grid container spacing={2} style={{ marginTop: "20px" }}>
+      <Container maxWidth={0}>
+        <Grid container spacing={3} style={{ marginTop: "20px" }}>
           {filteredItems.map((product, index) => {
             const { id, image, title, price } = product;
 
@@ -62,14 +67,8 @@ const Cart = () => {
                   <CardMedia
                     component="img"
                     alt={title}
-                    height=""
+                    height="80%"
                     image={image}
-                    style={{
-                      margin: "auto",
-                      maxwidth: "100%",
-                      height: "auto",
-                      alignItems: "center",
-                    }}
                   />
                   <CardContent
                     style={{
@@ -77,36 +76,38 @@ const Cart = () => {
                       flexDirection: "column",
                       justifyContent: "center",
                       height: "100%",
-                      flexGrow: 1,
                     }}
                   >
-                    <Typography gutterBottom variant="h5">
+                    <Typography
+                      gutterBottom
+                      variant="h5"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
                       {title}
                     </Typography>
                     <Typography
                       variant="body2"
                       color="text.secondary"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        margin: "auto",
-                      }}
+                      sx={{ display: "flex", flexDirection: "column" }}
+                      // style={{ display: "flex", alignItems: "center", margin: "auto" }}
                     >
                       $ {price}
                     </Typography>
                   </CardContent>
                   <CardActions>
                     <div className="countHandler">
-                      <button
-                        onClick={() => dispatch(removeFromCart(product.id))}
-                      >
+                      <Button onClick={() => decreaseItemQuantity(id)}>
                         -
-                      </button>
+                      </Button>
 
                       <input value={storedCartItems[id]} />
-                      <button onClick={() => dispatch(addToCart(product.id))}>
+                      <Button onClick={() => increaseItemQuantity(id)}>
                         +
-                      </button>
+                      </Button>
                     </div>
                   </CardActions>
                 </Card>

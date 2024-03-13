@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
-function Login({ setToken }) {
+function Login() {
   const [userName, setUserName] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [error, setError] = useState("");
@@ -15,12 +15,11 @@ function Login({ setToken }) {
         password: userPassword,
       });
 
-      setToken(response.data.token);
-      navigate("/shop");
       localStorage.setItem("userToken", response.data.token);
       setError("");
       setUserName("");
       setUserPassword("");
+      navigate("/shop");
     } catch (error) {
       setError(error.response.data);
     }
