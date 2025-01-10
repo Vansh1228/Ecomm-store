@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    container_name: react_frontend
+    ports:
+      - "8080:80"
+    environment:
+      REACT_APP_BACKEND_URL: http://elixir_backend:4000
+  db:
+    image: postgres:13-alpine
+    container_name: postgres
+    environment: 
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin1228
+      POSTGRES_DB: fakestoreAPI
+    # volumes:
+    #   - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: elixir_backend
+    depends_on:
+      - db
+    env_file:
+      - ./backend/docker.env
+    # command: /bin/sh ./backend/docker_dev_start.sh
+    # network_mode: "host"
+    environment: 
+      # DB_USERNAME: postgres
+      # DB_PASSWORD: admin1228
+      # DB_HOST: localhost
+      # DB_NAME: fakestoreAPI
+      PHX_HOST: ecomm
+      DATABASE_URL: ecto://postgres:admin1228@db/fakestoreAPI
+  
+      SECRET_KEY_BASE: a1AGOg4T9mmnrPkH+yZNOZK8p7jVoMUQehuqISdBOCjjeNGzUIsWJjn32ItObwFQ
+    ports:
+      - "4000:4000"
+
+  
+
+volumes:
+  postgres_data:
