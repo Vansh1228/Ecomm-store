@@ -1,5 +1,8 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { fetchCartItems, addToCart, removeFromCart } from "../Redux/cartSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProd } from "../Redux/FetchProductSlice";
+import axios from "axios";
 import {
   Card,
   CardActions,
@@ -10,49 +13,56 @@ import {
   Button,
   Container,
 } from "@mui/material";
-import { addToCart, removeFromCart } from "../Redux/cartSlice";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-const Cart = () => {
-  const cartItems = useSelector((state) => state.cart);
-  // Get cart items from the Redux store
+import { fetchProd } from "../Redux/FetchProductSlice";
+const Cart = ({ userId }) => {
   const apiData = useSelector((state) => state.AllProducts);
 
-  const dispatch = useDispatch(); // Initialize dispatch function
+ 
   const navigate = useNavigate();
-  const storedCartItems = JSON.parse(localStorage.getItem("MyCart")) || {};
-  const cartItemKeys = Object.keys(storedCartItems);
-
-  const filteredItems = apiData.filter((product) => {
-    return cartItemKeys.includes(product.id.toString());
-  });
-  const totalAmount = filteredItems.reduce((total, product) => {
-    const quantity = cartItems[product.id] || 0;
-
-    return total + product.price * quantity;
-  }, 0);
-  const length = Object.keys(storedCartItems).length === 0;
-
+  const dispatch = useDispatch();
+  const cartItems = Object.entries(useSelector((state) => state.cart.items));
   useEffect(() => {
-    if (length) {
-      // Redirect to the shop page if the cart is empty
-      navigate("/shop");
-    } else {
-      dispatch(fetchProd());
+    dispatch(fetchProd());
+  }, [dispatch, apiData.length]);
+  useEffect(() => {
+    if (userId) {
+      dispatch(fetchCartItems(userId));
     }
-  }, [apiData.length, dispatch, length]);
-  const increaseItemQuantity = (id) => {
-    dispatch(addToCart(id));
+  }, [userId]); 
+
+  const filteredItems = cartItems.map(([product_id, quantity]) => {
+    const product = apiData.find((p) => p.id === parseInt(product_id));
+    return {
+      product_id: parseInt(product_id),
+      quantity,
+      product,
+    };
+  });
+ 
+  const handleAddToCart = (productId) => {
+    dispatch(addToCart({ productId, userId }));
   };
-  const decreaseItemQuantity = (id) => {
-    dispatch(removeFromCart(id));
+  const placeOrder = async () => {
+    await axios.post(`${process.env.REACT_APP_BACKEND_URL}/cartitems/place_order`, {
+      user_id: userId,
+    });
+    // navigate("/shop"); 
   };
+  const handleRemoveFromCart = (productId) => {
+    dispatch(removeFromCart({ productId, userId }));
+  };
+
+  const totalAmount = filteredItems.reduce((total, item) => {
+    return total + item.product.price * item.quantity;
+  }, 0);
+
   return (
     <div className="cart">
       <Container maxWidth={0}>
         <Grid container spacing={3} style={{ marginTop: "20px" }}>
-          {filteredItems.map((product, index) => {
-            const { id, image, title, price } = product;
+          {filteredItems.map((item, index) => {
+            
+            const { id, image, title, price } = item.product;
 
             return (
               <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={index}>
@@ -93,21 +103,18 @@ const Cart = () => {
                       variant="body2"
                       color="text.secondary"
                       sx={{ display: "flex", flexDirection: "column" }}
-                      // style={{ display: "flex", alignItems: "center", margin: "auto" }}
                     >
                       $ {price}
                     </Typography>
                   </CardContent>
                   <CardActions>
                     <div className="countHandler">
-                      <Button onClick={() => decreaseItemQuantity(id)}>
+                      <Button onClick={() => handleRemoveFromCart(id)}>
                         -
                       </Button>
 
-                      <input value={storedCartItems[id]} />
-                      <Button onClick={() => increaseItemQuantity(id)}>
-                        +
-                      </Button>
+                      <input value={item.quantity} />
+                      <Button onClick={() => handleAddToCart(id)}>+</Button>
                     </div>
                   </CardActions>
                 </Card>
@@ -116,7 +123,10 @@ const Cart = () => {
           })}
         </Grid>
         <div className="total">
-          <h2>Total Amount: {totalAmount.toFixed(2)}</h2>
+          <h2>Total Amount: $ {totalAmount.toFixed(2)}</h2>
+        </div>
+        <div className="BuyNow">
+          <button onClick={placeOrder}>Place Order</button>
         </div>
       </Container>
     </div>

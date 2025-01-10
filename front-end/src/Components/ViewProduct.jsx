@@ -1,29 +1,28 @@
-import { useState, useEffect } from "react";
-import { fetchProd } from "../Redux/FetchProductSlice";
-import { useDispatch, useSelector } from "react-redux";
+import React,{ useState, useEffect } from "react";
 import {
   Card,
   CardContent,
   CardMedia,
   Typography,
-  Grid,
-  Container,
+
 } from "@mui/material";
 import { useParams } from "react-router-dom";
+import axios from "axios";
 function ViewProduct() {
   const [viewProduct, setVIewProduct] = useState([]);
   const { id } = useParams();
 
-  const dispatch = useDispatch();
-  const apiData = useSelector((state) => state.AllProducts);
   useEffect(() => {
-    dispatch(fetchProd());
-  }, [dispatch]);
-  useEffect(() => {
-    const myProduct = apiData.find((prod) => prod.id == id);
-    setVIewProduct(myProduct);
-  }, [apiData.length]);
+    const fetchViewProduct = async () => {
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/viewproduct/${id}`
+      );
 
+      setVIewProduct(response.data);
+    };
+    fetchViewProduct();
+  }, [id]);
+  
   if (!viewProduct) {
     return <div>Loading...</div>;
   }
@@ -31,6 +30,7 @@ function ViewProduct() {
 
   return (
     <div
+    
       className="cart"
       style={{
         position: "relative",
@@ -53,6 +53,7 @@ function ViewProduct() {
             alignItems: "center",
           }}
         />
+        Loading...
         <CardContent
           style={{
             display: "flex",

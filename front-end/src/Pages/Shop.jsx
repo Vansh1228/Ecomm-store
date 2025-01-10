@@ -5,13 +5,13 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
 import { ImgMediaCard } from "../Components/Card";
 import { Grid, Container } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { fetchProd } from "../Redux/FetchProductSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-function Shop() {
+function Shop({userId}) {
   const [data, setData] = useState([]);
-
+  
   const [shopDet, setShopDet] = useState([]);
   const [categories, setCategories] = useState([]);
 
@@ -19,11 +19,17 @@ function Shop() {
   const cartItems = useSelector((state) => state.cart);
   const apiData = useSelector((state) => state.AllProducts); //Fetching API Data from Redux Store
   const dispatch = useDispatch();
+  const handleLogOut = (e) => {
+    e.preventDefault();
+    localStorage.removeItem("userToken");
+    navigate("/login");
+  };
   useEffect(() => {
     dispatch(fetchProd());
-  }, [dispatch]);
+  }, [dispatch, apiData.length]);
   useEffect(() => {
-    const fetchData = async () => {
+    //Theme config
+    const fetchData = async () => { 
       try {
         const result = await fetch("http://localhost:3000/");
         const data = await result.json();
@@ -32,7 +38,7 @@ function Shop() {
         console.error("Error fetching data:", error);
       }
     };
-
+// Categories
     const fetchCategories = async () => {
       try {
         const categoriesResult = await fetch(
@@ -52,7 +58,7 @@ function Shop() {
       return indiCatgs.includes(product.category);
     });
     indiCatgs.length > 0 ? setData(filteredItems) : setData(apiData);
-  }, [cartItems, apiData.length, indiCatgs]);
+  }, [ apiData.length]);
 
   const handleCategory = (event, myCategory) => {
     const isChecked = event.target.checked;
@@ -72,6 +78,8 @@ function Shop() {
       alert("Cart is empty!");
     }
   };
+  const navigate = useNavigate();
+
 
   return (
     <Link to="/shop">
@@ -85,7 +93,7 @@ function Shop() {
             </>
           ))}
         </div>
-        <Link to="/cart">
+        <Link to={`/cartitems/${userId}`}>
           <div className="cart">
             <IconButton onClick={handleCartClick} color="error">
               <Badge badgeContent={CartItemsLength} color="primary">
@@ -94,6 +102,8 @@ function Shop() {
             </IconButton>
           </div>
         </Link>
+        <button onClick={handleLogOut}>Logout</button>
+        <Link to = {`/orders/${userId}`} >My Orders</Link>
       </div>
 
       <div>
@@ -113,12 +123,13 @@ function Shop() {
         </section>
       </div>
       <div className="products">
+        {console.log('SHOP ID', userId)}
         <Container maxWidth={false}>
           <Grid container spacing={3} style={{ marginTop: "20px" }}>
             {data.map((product, index) => {
               return (
                 <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={index}>
-                  <ImgMediaCard data={product} />
+                  <ImgMediaCard data={product} userId = {userId} />
                 </Grid>
               );
             })}

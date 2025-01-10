@@ -13,16 +13,22 @@ import {
   Typography,
 } from "@mui/material";
 
-export const ImgMediaCard = (props) => {
+export const ImgMediaCard = ({data, userId}) => {
+
   const cartItems = useSelector((state) => state.cart);
   const fetchStoredItemIds = Object.keys(cartItems);
-  const dispatch = useDispatch();
-  const handleOnCLick = () => {
-    dispatch(addToCart(props.data.id));
-  };
 
-  const { id, image, title, price } = props.data;
+  const dispatch = useDispatch();
+
+  const handleOnCLick = (productId)=>{
+    dispatch(addToCart({ productId, userId }));
+  }
+  
+
+  const { id, image, title, price } = data;
   const currentItemId = fetchStoredItemIds.includes(id.toString());
+ 
+
 
   return (
     <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
@@ -56,12 +62,12 @@ export const ImgMediaCard = (props) => {
       </CardContent>
       <CardActions>
         {currentItemId ? (
-          <Link to="/cart">Go to Cart</Link>
+          <Link to={`/cartitems/${userId}`}>Go to Cart</Link>
         ) : (
-          <Button onClick={handleOnCLick}> Add to cart</Button>
+          <Button onClick={()=> handleOnCLick(id)}> Add to cart</Button>
         )}
 
-        <Link to={`/product/${id}`}>View</Link>
+        <Link to={`/view/${id}`}>View</Link>
       </CardActions>
     </Card>
   );
